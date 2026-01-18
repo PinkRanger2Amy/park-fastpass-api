@@ -1,0 +1,25 @@
+{
+  "name": "park-fastpass-api",
+  "description": "Park FastPass system - Skip the lines at theme parks!",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": {
+      "description": "Database URL for SQLAlchemy",
+      "required": false
+    },
+    "API_PORT": {
+      "description": "API server port",
+      "value": "8765",
+      "required": false
+    },
+    "ENVIRONMENT": {
+      "description": "Environment (development/production)",
+      "value": "production",
+      "required": false
+    }
+  }
+}
