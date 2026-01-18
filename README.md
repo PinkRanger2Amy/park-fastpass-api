@@ -174,11 +174,9 @@ python scripts/seed_rides.py
 
 Feel free to fork, modify, and submit pull requests!
 
-## 📄 License
 
-MIT License - See LICENSE file for details
 
-## 👨‍💻 Author
+## 👨‍💻 Author Amaris Sneed
 
 Park FastPass Developer - 2026
 
@@ -189,3 +187,12 @@ Skip the lines and experience more rides with Park FastPass! 🎢✨
 ---
 
 **Questions?** Check the API docs at `http://localhost:8765/docs`
+
+<img width="1333" height="724" alt="Screenshot 2026-01-17 at 9 34 44 PM" src="https://github.com/user-attachments/assets/2e5a0608-a5f1-4f7a-9494-068f74689160" />
+
+<img width="1333" height="724" alt="Screenshot 2026-01-17 at 9 34 56 PM" src="https://github.com/user-attachments/assets/f2836b21-cf3e-4b36-be37-479ca0ed11f1" />
+
+<img width="1333" height="724" alt="Screenshot 2026-01-17 at 9 35 05 PM" src="https://github.com/user-attachments/assets/876545c4-a573-4ae0-8781-78eecd04328e" />
+
+<img width="1333" height="724" alt="Screenshot 2026-01-17 at 9 35 13 PM" src="https://github.com/user-attachments/assets/171822b6-8766-48cf-891b-fd133d6328c1" />
+
