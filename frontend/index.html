@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Park FastPass - Skip the Lines!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+            --success: #2ECC71;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 25%, #EC4899 50%, #F472B6 75%, #60A5FA 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--secondary);
+            font-size: 1.1em;
+            font-style: italic;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .ride-card {
+            border-left: 5px solid var(--primary);
+        }
+
+        .ride-name {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .ride-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background: var(--light);
+            border-radius: 5px;
+        }
+
+        .info-label {
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: var(--dark);
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .queue-time {
+            font-size: 1.8em;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light);
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #FF5252;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #3BB8AA;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27AE60;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        .fastpass-item {
+            border-left: 5px solid var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fastpass-details {
+            flex: 1;
+        }
+
+        .visitor-name {
+            font-size: 1.2em;
+            color: var(--dark);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .tier-standard {
+            background: #E8E8E8;
+            color: #333;
+        }
+
+        .tier-express {
+            background: #FFE66D;
+            color: #333;
+        }
+
+        .tier-premium {
+            background: #FF9FF3;
+            color: white;
+        }
+
+        .status-active {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-inactive {
+            color: #E74C3C;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--dark);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert-success {
+            background: #D5F4E6;
+            color: #27AE60;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background: #FADBD8;
+            color: #C0392B;
+            border-left: 4px solid #E74C3C;
+        }
+
+        .alert-info {
+            background: #D6EAF8;
+            color: #1F618D;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--dark);
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎢 Park FastPass</h1>
+            <p class="tagline">Skip the lines and enjoy more rides!</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('rides')">📍 Browse Rides</button>
+            <button class="nav-btn" onclick="switchTab('purchase')">🎫 Purchase FastPass</button>
+            <button class="nav-btn" onclick="switchTab('mypass')">📱 My FastPass</button>
+            <button class="nav-btn" onclick="switchTab('checkin')">✅ Check In</button>
+        </div>
+
+        <!-- RIDES TAB -->
+        <div id="rides" class="tab-content active">
+            <div id="rides-alert" class="alert"></div>
+            <div id="rides-loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading rides...</p>
+            </div>
+            <div id="rides-list" class="grid-2"></div>
+        </div>
+
+        <!-- PURCHASE TAB -->
+        <div id="purchase" class="tab-content">
+            <div class="card">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">🎫 Purchase a FastPass</h2>
+                <div id="purchase-alert" class="alert"></div>
+                <form id="purchaseForm" onsubmit="purchaseFastPass(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rideSelect">Select a Ride *</label>
+                            <select id="rideSelect" required>
+                                <option value="">-- Choose a ride --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tierSelect">FastPass Tier *</label>
+                            <select id="tierSelect" required>
+                                <option value="standard">Standard - $15</option>
+                                <option value="express">Express - $30</option>
+                                <option value="premium">Premium - $50</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="visitorName">Your Name *</label>
+                            <input type="text" id="visitorName" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="visitorEmail">Email Address *</label>
+                            <input type="email" id="visitorEmail" required placeholder="john@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="validFrom">Valid From *</label>
+                            <input type="datetime-local" id="validFrom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="validUntil">Valid Until *</label>
+                            <input type="datetime-local" id="validUntil" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="button btn-primary">Purchase FastPass</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MY PASS TAB -->
+        <div id="mypass" class="tab-content">
+            <div class="card">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">📱 My FastPasses</h2>
+                <div class="form-group">
+                    <label for="emailSearch">Enter your email to view passes:</label>
+                    <input type="email" id="emailSearch" placeholder="your@email.com">
+                    <button onclick="searchMyPasses()" class="button btn-secondary">Search</button>
+                </div>
+            </div>
+            <div id="mypass-alert" class="alert"></div>
+            <div id="mypass-loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading passes...</p>
+            </div>
+            <div id="mypass-list"></div>
+        </div>
+
+        <!-- CHECK-IN TAB -->
+        <div id="checkin" class="tab-content">
+            <div class="card">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">✅ Check In to Ride</h2>
+                <div id="checkin-alert" class="alert"></div>
+                <form id="checkinForm" onsubmit="checkInFastPass(event)">
+                    <div class="form-group">
+                        <label for="fastpassId">FastPass ID *</label>
+                        <input type="number" id="fastpassId" required placeholder="Enter your FastPass ID">
+                    </div>
+                    <button type="submit" class="button btn-success">Check In</button>
+                </form>
+            </div>
+            <div id="checkin-result" class="card" style="display: none; margin-top: 20px;">
+                <div id="checkin-result-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Park FastPass. Have a magical day! ✨</p>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:8765/api';
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'rides') {
+                loadRides();
+            } else if (tabName === 'purchase') {
+                loadRidesForPurchase();
+            }
+        }
+
+        // Load Rides
+        async function loadRides() {
+            const loading = document.getElementById('rides-loading');
+            const list = document.getElementById('rides-list');
+            const alert = document.getElementById('rides-alert');
+
+            loading.classList.add('active');
+            list.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/rides`);
+                if (!response.ok) throw new Error('Failed to load rides');
+                
+                const rides = await response.json();
+                
+                if (rides.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎢</div>
+                            <p>No rides available yet</p>
+                        </div>
+                    `;
+                } else {
+                    rides.forEach(ride => {
+                        const card = document.createElement('div');
+                        card.className = 'card ride-card';
+                        card.innerHTML = `
+                            <div class="ride-name">${ride.name}</div>
+                            <div class="ride-info">
+                                <div class="info-item">
+                                    <div class="info-label">Location</div>
+                                    <div class="info-value">${ride.location}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Queue Time</div>
+                                    <div class="queue-time">${ride.queue_time} min</div>
+                                </div>
+                                ${ride.min_height ? `
+                                    <div class="info-item">
+                                        <div class="info-label">Min Height</div>
+                                        <div class="info-value">${ride.min_height} ft</div>
+                                    </div>
+                                ` : ''}
+                                ${ride.park_area ? `
+                                    <div class="info-item">
+                                        <div class="info-label">Park Area</div>
+                                        <div class="info-value">${ride.park_area}</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            ${ride.description ? `<p>${ride.description}</p>` : ''}
+                        `;
+                        list.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                showAlert('rides-alert', 'Error loading rides: ' + error.message, 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // Load Rides for Purchase
+        async function loadRidesForPurchase() {
+            try {
+                const response = await fetch(`${API_URL}/rides`);
+                if (!response.ok) throw new Error('Failed to load rides');
+                
+                const rides = await response.json();
+                const select = document.getElementById('rideSelect');
+                select.innerHTML = '<option value="">-- Choose a ride --</option>';
+                
+                rides.forEach(ride => {
+                    const option = document.createElement('option');
+                    option.value = ride.id;
+                    option.textContent = `${ride.name} (Queue: ${ride.queue_time} min)`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showAlert('purchase-alert', 'Error loading rides: ' + error.message, 'error');
+            }
+        }
+
+        // Purchase FastPass
+        async function purchaseFastPass(event) {
+            event.preventDefault();
+            const alert = document.getElementById('purchase-alert');
+
+            try {
+                const payload = {
+                    ride_id: parseInt(document.getElementById('rideSelect').value),
+                    visitor_name: document.getElementById('visitorName').value,
+                    visitor_email: document.getElementById('visitorEmail').value,
+                    tier: document.getElementById('tierSelect').value,
+                    valid_from: new Date(document.getElementById('validFrom').value).toISOString(),
+                    valid_until: new Date(document.getElementById('validUntil').value).toISOString(),
+                    max_uses: 1
+                };
+
+                const response = await fetch(`${API_URL}/fastpasses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Purchase failed');
+                
+                const result = await response.json();
+                showAlert('purchase-alert', `✅ FastPass purchased! ID: ${result.id}`, 'success');
+                document.getElementById('purchaseForm').reset();
+            } catch (error) {
+                showAlert('purchase-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        // Search My Passes
+        async function searchMyPasses() {
+            const email = document.getElementById('emailSearch').value;
+            const list = document.getElementById('mypass-list');
+            const alert = document.getElementById('mypass-alert');
+            const loading = document.getElementById('mypass-loading');
+
+            if (!email) {
+                showAlert('mypass-alert', 'Please enter your email', 'error');
+                return;
+            }
+
+            loading.classList.add('active');
+            list.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/fastpasses/visitor/${email}`);
+                
+                if (!response.ok) {
+                    throw new Error('No FastPasses found for this email');
+                }
+
+                const passes = await response.json();
+                
+                passes.forEach(pass => {
+                    const card = document.createElement('div');
+                    card.className = 'card fastpass-item';
+                    card.innerHTML = `
+                        <div class="fastpass-details">
+                            <div class="visitor-name">FastPass ID: ${pass.id}</div>
+                            <div class="info-label">Ride #${pass.ride_id}</div>
+                            <span class="tier-badge tier-${pass.tier}">${pass.tier.toUpperCase()}</span>
+                            <div style="margin-top: 10px;">
+                                <div class="info-label">Usage</div>
+                                <div>${pass.times_used} / ${pass.max_uses} uses</div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <div class="info-label">Status</div>
+                                <div class="${pass.is_active ? 'status-active' : 'status-inactive'}">
+                                    ${pass.is_active ? '✅ Active' : '❌ Inactive'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+
+                showAlert('mypass-alert', `Found ${passes.length} FastPass(es)`, 'success');
+            } catch (error) {
+                showAlert('mypass-alert', 'Error: ' + error.message, 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // Check In
+        async function checkInFastPass(event) {
+            event.preventDefault();
+            const fastpassId = document.getElementById('fastpassId').value;
+            const alert = document.getElementById('checkin-alert');
+            const result = document.getElementById('checkin-result');
+
+            try {
+                const response = await fetch(`${API_URL}/fastpasses/${fastpassId}/checkin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Check-in failed');
+                
+                const data = await response.json();
+                
+                showAlert('checkin-alert', `✅ ${data.message}`, 'success');
+                result.style.display = 'block';
+                result.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">✨</div>
+                        <div style="font-size: 1.5em; color: var(--success); font-weight: bold; margin-bottom: 10px;">Success!</div>
+                        <div style="font-size: 1.2em; color: var(--dark);">You have ${data.remaining_uses} uses remaining</div>
+                    </div>
+                `;
+                document.getElementById('checkinForm').reset();
+            } catch (error) {
+                showAlert('checkin-alert', 'Error: ' + error.message, 'error');
+                result.style.display = 'none';
+            }
+        }
+
+        // Helper function to show alerts
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert active alert-${type}`;
+            alert.textContent = message;
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadRides();
+        });
+    </script>
+</body>
+</html>
